@@ -1,0 +1,75 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: Deploy Infra AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout código do repositório
+        uses: actions/checkout@v4
+
+      - name: 🔑 Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: 🏗️ Instalar Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0
+
+      - name: 📂 Verificar Terraform Formatting
+        run: terraform fmt -check
+
+      - name: 🔄 Inicializar Terraform
+        run: terraform init
+
+      - name: ✅ Validar Terraform
+        run: terraform validate
+
+      - name: 🔍 Planejar Terraform
+        run: terraform plan
+
+      - name: 🚀 Aplicar Terraform (Deploy Infra)
+        run: terraform apply -auto-approve
+
+      - name: 🚀 Atualizar Configuração do EKS no kubeconfig
+        run: aws eks update-kubeconfig --region us-east-1 --name my-cluster
+
+      - name: 🔄 Construir e Enviar Imagens Docker para o ECR
+        run: ./build-push.sh
+
+      - name: 📦 Verificar se as imagens foram enviadas para o ECR
+        run: |
+          REPOSITORY_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
+          REPOSITORY_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
+
+          if [ -z "$REPOSITORY_AUTH" ] || [ -z "$REPOSITORY_PROCESS" ]; then
+            echo "Erro: Repositórios no ECR não encontrados."
+            exit 1
+          else
+            echo "Repositórios encontrados: $REPOSITORY_AUTH, $REPOSITORY_PROCESS"
+          fi
+
+      - name: 🚀 Implantar `auth` no Kubernetes
+        run: kubectl rollout restart deployment/auth-php
+
+      - name: 🚀 Implantar `processing` no Kubernetes
+        run: kubectl rollout restart deployment/processing-php
+
+      - name: ✅ Verificar Status dos Deployments
+        run: kubectl get pods -n default
