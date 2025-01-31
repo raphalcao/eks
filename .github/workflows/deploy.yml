@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout código do repositório
+      - name: 👥 Checkout código do repositório
         uses: actions/checkout@v4
 
       - name: 🔑 Configurar AWS Credentials Manualmente
@@ -29,7 +29,7 @@ jobs:
       - name: 🔄 Teste de Autenticação na AWS
         run: aws sts get-caller-identity
 
-      - name: 🏗️ Instalar Terraform
+      - name: 🏷️ Instalar Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.0
@@ -75,3 +75,9 @@ jobs:
 
       - name: ✅ Verificar Status dos Deployments
         run: kubectl get pods -n default
+
+      - name: 🔍 Verificar Logs do Kubernetes
+        run: kubectl logs -l app=auth-php -n default --tail=50
+
+      - name: 🔄 Limpar Recursos Não Utilizados
+        run: terraform destroy -auto-approve
