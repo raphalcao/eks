@@ -1,14 +1,16 @@
-variable "aws_access_key" {
-  description = "AWS Access Key ID"
-  type        = string
+variable "cluster_name" {
+  default = "my-cluster"
 }
 
-variable "aws_secret_key" {
-  description = "AWS Secret Access Key"
-  type        = string
+variable "ecr_repositories" {
+  type    = list(string)
+  default = ["auth-php", "processing-php"]
 }
 
-variable "aws_region" {
-  description = "AWS region"
-  default     = "us-east-1"
+variable "github_repositories" {
+  type    = map(string)
+  default = {
+    "auth"        = "https://github.com/raphalcao/auth.git"
+    "processing"  = "https://github.com/raphalcao/processing.git"
+  }
 }
