@@ -23,13 +23,18 @@ jobs:
       - name: 🔧 Suprimir aviso do AWS SDK
         run: echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1" >> $GITHUB_ENV
 
-      - name: 🔑 Configurar AWS Credentials Manualmente
+      - name: 🔑 Configurar AWS Credentials Manualmente (Usando Perfil Default)
         run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
+          echo "[default]" > ~/.aws/config
+          echo "region=us-east-1" >> ~/.aws/config
+          chmod 600 ~/.aws/credentials ~/.aws/config
 
-      - name: 🔄 Teste de Autenticação na AWS
+      - name: 🔄 Testar Conexão com AWS (Usando Perfil Default)
         run: aws sts get-caller-identity --profile default
 
       - name: 🏗️ Instalar Terraform
@@ -54,7 +59,7 @@ jobs:
 
       - name: 🚀 Atualizar Configuração do EKS no kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name my-cluster
+          aws eks update-kubeconfig --region us-east-1 --name my-cluster --profile default
           kubectl cluster-info
 
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
@@ -62,8 +67,8 @@ jobs:
 
       - name: 📦 Verificar se as imagens foram enviadas para o ECR
         run: |
-          REPOSITORY_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
-          REPOSITORY_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
+          REPOSITORY_AUTH=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
+          REPOSITORY_PROCESS=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
 
           if [ -z "$REPOSITORY_AUTH" ] || [ -z "$REPOSITORY_PROCESS" ]; then
             echo "Erro: Repositórios no ECR não encontrados."
