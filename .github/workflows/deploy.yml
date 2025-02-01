@@ -25,7 +25,6 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
-          audience: sts.amazonaws.com
 
       - name: 🔄 Teste de Autenticação na AWS
         run: aws sts get-caller-identity
@@ -51,7 +50,9 @@ jobs:
         run: terraform apply -auto-approve
 
       - name: 🚀 Atualizar Configuração do EKS no kubeconfig
-        run: aws eks update-kubeconfig --region us-east-1 --name my-cluster
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name my-cluster
+          kubectl cluster-info
 
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
         run: ./build-push.sh
@@ -69,10 +70,14 @@ jobs:
           fi
 
       - name: 🚀 Implantar `auth` no Kubernetes
-        run: kubectl rollout restart deployment/auth-php
+        run: |
+          kubectl rollout restart deployment/auth-php
+          kubectl get deployments auth-php -o wide
 
       - name: 🚀 Implantar `processing` no Kubernetes
-        run: kubectl rollout restart deployment/processing-php
+        run: |
+          kubectl rollout restart deployment/processing-php
+          kubectl get deployments processing-php -o wide
 
       - name: ✅ Verificar Status dos Deployments
         run: kubectl get pods -n default
