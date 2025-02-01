@@ -23,16 +23,11 @@ jobs:
       - name: 🔧 Suprimir aviso do AWS SDK
         run: echo "AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE=1" >> $GITHUB_ENV
 
-      - name: 🔄 Testar Conexão com OIDC
+      - name: 🔑 Configurar AWS Credentials Manualmente
         run: |
-          curl -sSf https://token.actions.githubusercontent.com/.well-known/openid-configuration | jq
-
-      - name: 🔑 Configurar AWS Credentials via OIDC
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: GitHubActionsSession
-          aws-region: us-east-1
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
 
       - name: 🔄 Teste de Autenticação na AWS
         run: aws sts get-caller-identity
