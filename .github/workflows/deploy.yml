@@ -30,7 +30,7 @@ jobs:
           echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
 
       - name: 🔄 Teste de Autenticação na AWS
-        run: aws sts get-caller-identity
+        run: aws sts get-caller-identity --profile default
 
       - name: 🏗️ Instalar Terraform
         uses: hashicorp/setup-terraform@v2
