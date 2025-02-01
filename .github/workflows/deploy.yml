@@ -33,10 +33,18 @@ jobs:
           echo "region=us-east-1" >> ~/.aws/config
           chmod 600 ~/.aws/credentials ~/.aws/config
 
+      - name: 🔄 Teste de Conexão AWS
+        run: aws sts get-caller-identity
+
       - name: 🏗️ Instalar Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.0
+
+      - name: 📂 Verificar Terraform Formatting
+        run: |
+          cd terraform-eks
+          terraform fmt -check
 
       - name: 🔄 Inicializar Terraform
         run: |
