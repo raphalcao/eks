@@ -20,13 +20,13 @@ jobs:
       - name: 👥 Checkout código do repositório
         uses: actions/checkout@v4
 
-      - name: 🔑 Configurar AWS Credentials Manualmente
-        run: |
-          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-          echo "AWS_REGION=us-east-1" >> $GITHUB_ENV
+      - name: 🔑 Configurar AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::447160349257:role/github-actions-role
+          aws-region: us-east-1
 
-      - name: 🔄 Teste de Autenticação na AWS
+      - name: 🛠️ Teste de Autenticação na AWS
         run: aws sts get-caller-identity
 
       - name: 🏷️ Instalar Terraform
@@ -43,7 +43,7 @@ jobs:
       - name: ✅ Validar Terraform
         run: terraform validate
 
-      - name: 🔍 Planejar Terraform
+      - name: 🔎 Planejar Terraform
         run: terraform plan
 
       - name: 🚀 Aplicar Terraform (Deploy Infra)
