@@ -20,16 +20,21 @@ jobs:
       - name: 📥 Checkout código do repositório
         uses: actions/checkout@v4
 
-      - name: 🔑 Configurar AWS Credentials Manualmente (Usando Perfil Default)
+      - name: 📂 Listar arquivos do repositório para Debug
+        run: ls -la
+
+      - name: 🔑 Configurar AWS Credentials Manualmente
         run: |
           mkdir -p ~/.aws
           echo "[default]" > ~/.aws/credentials
           echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
           echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
-          echo "aws_session_token=${{ secrets.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
           echo "[default]" > ~/.aws/config
           echo "region=us-east-1" >> ~/.aws/config
           chmod 600 ~/.aws/credentials ~/.aws/config
+
+      - name: 🔄 Teste de Conexão AWS
+        run: aws sts get-caller-identity
 
       - name: 🏗️ Instalar Terraform
         uses: hashicorp/setup-terraform@v2
@@ -37,23 +42,33 @@ jobs:
           terraform_version: 1.6.0
 
       - name: 📂 Verificar Terraform Formatting
-        run: terraform fmt -check
+        run: |
+          cd terraform-eks
+          terraform fmt -check
 
       - name: 🔄 Inicializar Terraform
-        run: terraform init
+        run: |
+          cd terraform-eks
+          terraform init
 
       - name: ✅ Validar Terraform
-        run: terraform validate
+        run: |
+          cd terraform-eks
+          terraform validate
 
       - name: 🔍 Planejar Terraform
-        run: terraform plan
+        run: |
+          cd terraform-eks
+          terraform plan -out=tfplan
 
       - name: 🚀 Aplicar Terraform (Deploy Infra)
-        run: terraform apply -auto-approve
+        run: |
+          cd terraform-eks
+          terraform apply -auto-approve
 
       - name: 🚀 Atualizar Configuração do EKS no kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name my-cluster --profile default
+          aws eks update-kubeconfig --region us-east-1 --name my-cluster
           kubectl cluster-info
 
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
@@ -61,8 +76,8 @@ jobs:
 
       - name: 📦 Verificar se as imagens foram enviadas para o ECR
         run: |
-          REPOSITORY_AUTH=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
-          REPOSITORY_PROCESS=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
+          REPOSITORY_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
+          REPOSITORY_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
 
           if [ -z "$REPOSITORY_AUTH" ] || [ -z "$REPOSITORY_PROCESS" ]; then
             echo "Erro: Repositórios no ECR não encontrados."
@@ -87,5 +102,8 @@ jobs:
       - name: 🔍 Verificar Logs do Kubernetes
         run: kubectl logs -l app=auth-php -n default --tail=50
 
-      - name: 🔄 Limpar Recursos Não Utilizados
-        run: terraform destroy -auto-approve
+      - name: ❌ Limpar Recursos Não Utilizados (Destruir Infraestrutura)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          cd terraform-eks
+          terraform destroy -auto-approve
