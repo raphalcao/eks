@@ -17,19 +17,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 👥 Checkout código do repositório
+      - name: 📥 Checkout código do repositório
         uses: actions/checkout@v4
 
-      - name: 🔑 Configurar AWS Credentials
+      - name: 🔑 Configurar AWS Credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v2
         with:
-          role-to-assume: arn:aws:iam::447160349257:role/github-actions-role
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
+          audience: sts.amazonaws.com
 
-      - name: 🛠️ Teste de Autenticação na AWS
+      - name: 🔄 Teste de Autenticação na AWS
         run: aws sts get-caller-identity
 
-      - name: 🏷️ Instalar Terraform
+      - name: 🏗️ Instalar Terraform
         uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.6.0
@@ -43,7 +44,7 @@ jobs:
       - name: ✅ Validar Terraform
         run: terraform validate
 
-      - name: 🔎 Planejar Terraform
+      - name: 🔍 Planejar Terraform
         run: terraform plan
 
       - name: 🚀 Aplicar Terraform (Deploy Infra)
