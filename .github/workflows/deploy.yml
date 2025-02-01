@@ -63,11 +63,6 @@ jobs:
           cd terraform-eks
           terraform plan -out=tfplan
 
-      - name: 🚀 Aplicar Terraform (Deploy Infra)
-        run: |
-          cd terraform-eks
-          terraform apply -auto-approve
-
       - name: 🚀 Atualizar Configuração do EKS no kubeconfig
         run: |
           aws eks update-kubeconfig --region us-east-1 --name my-cluster

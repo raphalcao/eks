@@ -36,4 +36,6 @@ terraform.rc
 .idea
 /infrastructure
 
+tfplan
+
 /*/plan.out
