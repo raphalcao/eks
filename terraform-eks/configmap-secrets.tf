@@ -4,9 +4,9 @@ resource "kubernetes_config_map" "app_config" {
   }
 
   data = {
-    APP_ENV    = "production"
-    APP_DEBUG  = "false"
-    DB_HOST    = "mysql.auth.svc.cluster.local"
+    APP_ENV     = "production"
+    APP_DEBUG   = "false"
+    DB_HOST     = "mysql.auth.svc.cluster.local"
     DB_DATABASE = "auth"
     DB_USERNAME = "root"
   }
@@ -18,6 +18,6 @@ resource "kubernetes_secret" "app_secrets" {
   }
 
   data = {
-    DB_PASSWORD = "cGFzc3dvcmQ="  # Base64 de "password"
+    DB_PASSWORD = "cGFzc3dvcmQ=" # Base64 de "password"
   }
 }
