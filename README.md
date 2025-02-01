@@ -2,14 +2,27 @@
 
 Este repositório tem como objetivo automatizar a infraestrutura do desafio de integração com o AWS EKS usando Terraform, juntamente com uma CI/CD pipeline via GitHub Actions.
 
-## Passo a Passo para Utilização do Repositório
+### Nota: 
+Para melhor uso, é recomendado o terminal do linux. No Windows, use o wsl.
+
+### Passo a Passo para Utilização do Repositório
 
 ### 1. Fazer um Fork
 Primeiro, faça um fork deste repositório para sua conta do GitHub.
 
-### 2. Criar um cluster no serviço da AWS - EKS
+### 1.1 Criar ou alterar as credenciais AWS.
 
-Criar um cluster no EKS 
+Execute o comando: `nano ~/.aws/config`
+Apague as credenciais 
+Cole as novas credencias e salve o arquivo.
+
+### 2. Criar um cluster no serviço da AWS - EKS
+    Etapas:
+        . Entre no painel da AWS 
+        . Amazon Elastic Kubernetes Service
+        . Criar Cluster
+        . Preencha os dados
+        . Salvar
 
 ### 3. Cadastrar as Chaves no GitHub
 
