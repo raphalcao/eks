@@ -8,9 +8,9 @@ variable "ecr_repositories" {
 }
 
 variable "github_repositories" {
-  type    = map(string)
+  type = map(string)
   default = {
-    "auth"        = "https://github.com/raphalcao/auth.git"
-    "processing"  = "https://github.com/raphalcao/processing.git"
+    "auth"       = "https://github.com/raphalcao/auth.git"
+    "processing" = "https://github.com/raphalcao/processing.git"
   }
 }
