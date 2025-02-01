@@ -58,16 +58,6 @@ jobs:
           cd terraform-eks
           terraform validate
 
-      - name: 🔍 Planejar Terraform
-        run: |
-          cd terraform-eks
-          terraform plan -out=tfplan
-
-      - name: 🚀 Atualizar Configuração do EKS no kubeconfig
-        run: |
-          aws eks update-kubeconfig --region us-east-1 --name my-cluster
-          kubectl cluster-info
-
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
         run: ./build-push.sh
 
