@@ -59,7 +59,10 @@ jobs:
           terraform validate
 
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
-        run: ./build-push.sh
+        run: |
+          cd terraform-eks
+          chmod +x build-push.sh
+          ./build-push.sh
 
       - name: 📦 Verificar se as imagens foram enviadas para o ECR
         run: |
