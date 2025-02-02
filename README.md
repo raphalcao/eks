@@ -14,7 +14,7 @@ Primeiro, faça um fork deste repositório para sua conta do GitHub.
 
 Execute o comando: `nano ~/.aws/config`
 Apague as credenciais 
-Cole as novas credencias e salve o arquivo.
+Cole as novas credencias e salve o arquivo (CTRL + X, aperte Y e depois ENTER).
 
 ### 2. Criar um cluster no serviço da AWS - EKS
     Etapas:
@@ -33,6 +33,7 @@ Para que o Terraform e os workflows do GitHub Actions funcionem corretamente, se
 
 - `AWS_ACCESS_KEY_ID`: Sua chave de acesso (Access Key ID) da AWS. 
 - `AWS_SECRET_ACCESS_KEY`: Sua chave secreta (Secret Access Key) da AWS.
+- `AWS_SESSION_TOKEN`: Seu token (Session Token) da AWS.
 - `AWS_REGION`: Sua região da AWS. Costuma ser us-east-1 
 
 Essas chaves serão utilizadas para autenticar o Terraform no AWS durante os workflows.

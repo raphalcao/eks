@@ -62,6 +62,11 @@ jobs:
       - name: 🔄 Testar Conexão com AWS (Perfil Default)
         run: aws sts get-caller-identity --profile default
 
+      - name: 🚀 Atualizar Configuração do EKS no kubeconfig
+        run: |
+          aws eks update-kubeconfig --region us-east-1 --name serious-folk-party --profile default
+          kubectl cluster-info
+
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
         run: |
           cd terraform-eks
@@ -70,8 +75,8 @@ jobs:
 
       - name: 📦 Verificar se as imagens foram enviadas para o ECR
         run: |
-          REPOSITORY_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
-          REPOSITORY_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
+          REPOSITORY_AUTH=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text)
+          REPOSITORY_PROCESS=$(aws ecr describe-repositories --profile default --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text)
 
           if [ -z "$REPOSITORY_AUTH" ] || [ -z "$REPOSITORY_PROCESS" ]; then
             echo "Erro: Repositórios no ECR não encontrados."
@@ -82,11 +87,19 @@ jobs:
 
       - name: 🚀 Implantar `auth` no Kubernetes
         run: |
+          echo "🔍 Verificando conexão com o cluster..."
+          kubectl get nodes || { echo "🚨 Erro: Cluster inacessível!"; exit 1; }
+
+          echo "🔄 Reiniciando deployment auth-php..."
           kubectl rollout restart deployment/auth-php
           kubectl get deployments auth-php -o wide
 
       - name: 🚀 Implantar `processing` no Kubernetes
         run: |
+          echo "🔍 Verificando conexão com o cluster..."
+          kubectl get nodes || { echo "🚨 Erro: Cluster inacessível!"; exit 1; }
+
+          echo "🔄 Reiniciando deployment processing-php..."
           kubectl rollout restart deployment/processing-php
           kubectl get deployments processing-php -o wide
 
