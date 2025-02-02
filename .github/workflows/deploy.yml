@@ -90,18 +90,28 @@ jobs:
           echo "🔍 Verificando conexão com o cluster..."
           kubectl get nodes || { echo "🚨 Erro: Cluster inacessível!"; exit 1; }
 
-          echo "🔄 Reiniciando deployment auth-php..."
-          kubectl rollout restart deployment/auth-php
-          kubectl get deployments auth-php -o wide
+          echo "🔎 Checando se o deployment auth-php existe..."
+          if kubectl get deployment auth-php &>/dev/null; then
+            echo "🔄 Reiniciando deployment auth-php..."
+            kubectl rollout restart deployment/auth-php
+            kubectl get deployments auth-php -o wide
+          else
+            echo "⚠️ Deployment auth-php não encontrado! Verifique se foi implantado corretamente."
+          fi
 
       - name: 🚀 Implantar `processing` no Kubernetes
         run: |
           echo "🔍 Verificando conexão com o cluster..."
           kubectl get nodes || { echo "🚨 Erro: Cluster inacessível!"; exit 1; }
 
-          echo "🔄 Reiniciando deployment processing-php..."
-          kubectl rollout restart deployment/processing-php
-          kubectl get deployments processing-php -o wide
+          echo "🔎 Checando se o deployment processing-php existe..."
+          if kubectl get deployment processing-php &>/dev/null; then
+            echo "🔄 Reiniciando deployment processing-php..."
+            kubectl rollout restart deployment/processing-php
+            kubectl get deployments processing-php -o wide
+          else
+            echo "⚠️ Deployment processing-php não encontrado! Verifique se foi implantado corretamente."
+          fi
 
       - name: ✅ Verificar Status dos Deployments
         run: kubectl get pods -n default

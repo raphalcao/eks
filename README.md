@@ -24,6 +24,11 @@ Cole as novas credencias e salve o arquivo (CTRL + X, aperte Y e depois ENTER).
         . Preencha os dados
         . Salvar
 
+### 2.1 Adicionar o nome do cluster no arquivo deploy.yml
+
+        . aws eks update-kubeconfig --region us-east-1 --name <nome_do_cluster> --profile default
+            Ex: aws eks update-kubeconfig --region us-east-1 --name serious-folk-party --profile default
+
 ### 3. Cadastrar as Chaves no GitHub
 
 Para que o Terraform e os workflows do GitHub Actions funcionem corretamente, será necessário cadastrar as credenciais da AWS no repositório do GitHub. Siga os passos abaixo:
