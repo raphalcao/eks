@@ -26,7 +26,7 @@ fi
 # 🏗️ **Construir e enviar imagem para o ECR (auth-php)**
 echo "🐳 Construindo e enviando imagem auth-php..."
 cd auth
-docker build -t auth-php .
+docker build -t auth-php -f .infra/docker/Dockerfile .
 docker tag auth-php:latest "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/auth-php:latest"
 docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/auth-php:latest"
 cd ..
@@ -34,7 +34,7 @@ cd ..
 # 🏗️ **Construir e enviar imagem para o ECR (processing-php)**
 echo "🐳 Construindo e enviando imagem processing-php..."
 cd processing
-docker build -t processing-php .
+docker build -t processing-php -f docker/Dockerfile .
 docker tag processing-php:latest "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/processing-php:latest"
 docker push "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/processing-php:latest"
 cd ..
