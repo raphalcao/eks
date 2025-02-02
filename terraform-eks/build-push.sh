@@ -1,17 +1,18 @@
 #!/bin/bash
-set -e  # Para execução caso um erro ocorra
+set -e  # Para interromper a execução se houver erro
 
-# 🏗️ Configura variáveis
+# 🏗️ Definição de variáveis
 AWS_REGION="us-east-1"
-AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text --profile default)
+AWS_PROFILE="default"  # Usa explicitamente o perfil default
+AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query "Account" --output text --profile $AWS_PROFILE)
 
-echo "🔑 Fazendo login no AWS ECR..."
-aws ecr get-login-password --region $AWS_REGION --profile default | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+echo "🔑 Fazendo login no AWS ECR usando perfil default..."
+aws ecr get-login-password --region $AWS_REGION --profile $AWS_PROFILE | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
 
 # 🔍 **Verifica se os repositórios existem antes de tentar fazer push**
 echo "🔎 Verificando repositórios no AWS ECR..."
-REPO_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text --profile default)
-REPO_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text --profile default)
+REPO_AUTH=$(aws ecr describe-repositories --query "repositories[?repositoryName=='auth-php'].repositoryName" --output text --profile $AWS_PROFILE)
+REPO_PROCESS=$(aws ecr describe-repositories --query "repositories[?repositoryName=='processing-php'].repositoryName" --output text --profile $AWS_PROFILE)
 
 if [[ -z "$REPO_AUTH" ]] || [[ -z "$REPO_PROCESS" ]]; then
     echo "🚨 Erro: Um ou mais repositórios não foram encontrados no ECR!"
