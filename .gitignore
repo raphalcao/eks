@@ -6,6 +6,9 @@
 *.tfstate
 *.tfstate.*
 
+# .pkg files
+*.pkg
+
 # Crash log files
 crash.log
 crash.*.log
@@ -39,3 +42,7 @@ terraform.rc
 tfplan
 
 /*/plan.out
+
+# Remove AWS Folder
+awscliv2.zip
+aws

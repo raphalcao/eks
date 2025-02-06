@@ -64,7 +64,7 @@ jobs:
 
       - name: 🚀 Atualizar Configuração do EKS no kubeconfig
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name serious-folk-party --profile default
+          aws eks update-kubeconfig --region us-east-1 --name exciting-hiphop-orca --profile default
           kubectl cluster-info
 
       - name: 🔄 Construir e Enviar Imagens Docker para o ECR
