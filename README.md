@@ -17,7 +17,7 @@ Apague as credenciais
 Cole as novas credencias e salve o arquivo (CTRL + X, aperte Y e depois ENTER).
 
 ### 1.2 Criar os repositorios no EKS 
-aws ecr create-repository --repository-name {nome_projeto_github} --region us-east-1 --profile default
+    Ex: aws ecr create-repository --repository-name {nome_projeto_github} --region us-east-1 --profile default
     Etapas: 
         . aws ecr create-repository --repository-name auth-php --region us-east-1 --profile default
         . aws ecr create-repository --repository-name processing-php --region us-east-1 --profile default
